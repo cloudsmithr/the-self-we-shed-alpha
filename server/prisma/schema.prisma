@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ======================================================================================================
+// PLAYER
+// ======================================================================================================
+
+model Player {
+  id            String      @id @default(uuid())
+  displayName   String
+  oauthProvider String
+  oauthId       String
+  createdAt     DateTime    @default(now())
+  lastActiveAt  DateTime    @updatedAt
+
+  @@unique([oauthProvider, oauthId])
+}
+
+// ======================================================================================================
+// GAME WORLD
+// ======================================================================================================
+
+enum GameWorldStatus {
+  active
+  completed
+  paused
+  removed
+}
+
+model GameWorld {
+  id            String              @id @default(uuid())
+  name          String
+  status        GameWorldStatus     @default(active)
+  createdAt     DateTime            @default(now())
+  completedAt   DateTime?
+
+  fortresses    Fortress[]
+  routes        Route[]
+  armies        Army[]
+}
+
+// ======================================================================================================
+// FORTRESS
+// ======================================================================================================
+
+enum FortressOwner {
+  human
+  enemy
+}
+
+model Fortress {
+  id                    String              @id @default(uuid())
+  gameWorldId           String
+  name                  String
+  positionX             Float
+  positionY             Float
+  owner                 FortressOwner       @default(enemy)
+  baseEnemyGarrison     Int
+  difficultyTier        Int
+  isFinalObjective      Boolean             @default(false)
+
+  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
+  sourceRoutes          Route[]             @relation("SourceRoutes")
+  targetRoutes          Route[]             @relation("TargetRoutes")
+  armies                Army[]
+}
+
+// ======================================================================================================
+// ROUTE
+// ======================================================================================================
+
+model Route {
+  id                    String              @id @default(uuid())
+  gameWorldId           String
+  sourceFortressId      String
+  targetFortressId      String
+  travelTimeSeconds     Int
+
+  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
+  sourceFortress        Fortress            @relation("SourceRoutes", fields: [sourceFortressId], references: [id])
+  targetFortress        Fortress            @relation("TargetRoutes", fields: [targetFortressId], references: [id])
+  armies                Army[]
+}
+
+// ======================================================================================================
+// ARMY
+// ======================================================================================================
+
+enum ArmyStatus {
+  idle
+  stationed
+  marching
+  attacking
+  defending
+  defeated
+}
+
+model Army {
+  id                    String              @id @default(uuid())
+  gameWorldId           String
+  routeId               String?
+  fortressId            String?
+  totalUnits            Int
+  departedAt            DateTime?
+  status                ArmyStatus          @default(idle)
+
+  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
+  route                 Route?              @relation(fields: [routeId], references: [id])
+  fortress              Fortress?           @relation(fields: [fortressId], references: [id])
+}
