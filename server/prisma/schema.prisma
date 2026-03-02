@@ -18,105 +18,95 @@ datasource db {
 // ======================================================================================================
 
 model Player {
-  id            String      @id @default(uuid())
-  displayName   String
-  oauthProvider String
-  oauthId       String
-  createdAt     DateTime    @default(now())
-  lastActiveAt  DateTime    @updatedAt
+  id                    String                  @id @default(uuid())
+  displayName           String                  @map("display_name")
+  oauthProvider         String                  @map("oauth_provider")
+  oauthId               String                  @map("oauth_id")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  lastActiveAt          DateTime                @updatedAt @map("last_active_at")
+
+  buildings             Building[]
 
   @@unique([oauthProvider, oauthId])
+  @@map("players")
 }
 
 // ======================================================================================================
 // GAME WORLD
 // ======================================================================================================
 
-enum GameWorldStatus {
-  active
-  completed
-  paused
-  removed
-}
-
 model GameWorld {
-  id            String              @id @default(uuid())
-  name          String
-  status        GameWorldStatus     @default(active)
-  createdAt     DateTime            @default(now())
-  completedAt   DateTime?
+  id                    String                  @id @default(uuid())
+  name                  String
+  status                String                  @default("active")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  completedAt           DateTime?               @map("completed_at")
+  config                Json
 
-  fortresses    Fortress[]
-  routes        Route[]
-  armies        Army[]
+  fortresses            Fortress[]
+  buildingTypes         BuildingType[]
+
+  @@map("game_worlds")
 }
 
 // ======================================================================================================
 // FORTRESS
 // ======================================================================================================
 
-enum FortressOwner {
-  human
-  enemy
-}
-
 model Fortress {
   id                    String              @id @default(uuid())
-  gameWorldId           String
+  gameWorldId           String              @map("game_world_id")
   name                  String
-  positionX             Float
-  positionY             Float
-  owner                 FortressOwner       @default(enemy)
-  baseEnemyGarrison     Int
-  difficultyTier        Int
-  isFinalObjective      Boolean             @default(false)
+  positionX             Float               @map("position_x")
+  positionY             Float               @map("position_y")
+  owner                 String              @default("enemy")
+  parentId              String?             @map("parent_id")
+  captureThreshold      Int                 @map("capture_threshold")
+  difficultyTier        Int                 @map("difficulty_tier")
+  capturedAt            DateTime            @default(now()) @map("captured_at")
 
   gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
-  sourceRoutes          Route[]             @relation("SourceRoutes")
-  targetRoutes          Route[]             @relation("TargetRoutes")
-  armies                Army[]
+  parent                Fortress?           @relation("FortressTree", fields: [parentId], references: [id])
+  children              Fortress[]          @relation("FortressTree")
+
+  buildings             Building[]
+
+  @@map("fortresses")
 }
 
 // ======================================================================================================
-// ROUTE
+// BuildingType
 // ======================================================================================================
 
-model Route {
+model BuildingType {
   id                    String              @id @default(uuid())
-  gameWorldId           String
-  sourceFortressId      String
-  targetFortressId      String
-  travelTimeSeconds     Int
+  gameWorldId           String              @map("game_world_id")
+  name                  String
+  productionRate        Float               @map("production_rate")
+  unlockTier            Int                 @map("unlock_tier")
+  description           String
 
   gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
-  sourceFortress        Fortress            @relation("SourceRoutes", fields: [sourceFortressId], references: [id])
-  targetFortress        Fortress            @relation("TargetRoutes", fields: [targetFortressId], references: [id])
-  armies                Army[]
+  buildings             Building[]
+
+  @@map("building_types")
 }
 
 // ======================================================================================================
-// ARMY
+// Building
 // ======================================================================================================
 
-enum ArmyStatus {
-  idle
-  stationed
-  marching
-  attacking
-  defending
-  defeated
-}
-
-model Army {
+model Building {
   id                    String              @id @default(uuid())
-  gameWorldId           String
-  routeId               String?
-  fortressId            String?
-  totalUnits            Int
-  departedAt            DateTime?
-  status                ArmyStatus          @default(idle)
+  fortressId            String              @map("fortress_id")
+  buildingTypeId        String              @map("building_type_id")
+  builtBy               String              @map("built_by")
+  builtAt               DateTime            @default(now()) @map("built_at")
+  unitCount             Int                 @default(0) @map("unit_count")
 
-  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
-  route                 Route?              @relation(fields: [routeId], references: [id])
-  fortress              Fortress?           @relation(fields: [fortressId], references: [id])
+  fortress              Fortress            @relation(fields: [fortressId], references: [id])
+  buildingType          BuildingType        @relation(fields: [buildingTypeId], references: [id])
+  player                Player              @relation(fields: [builtBy], references: [id])
+
+  @@map("buildings")
 }
