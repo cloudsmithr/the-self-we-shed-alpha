@@ -18,14 +18,14 @@ datasource db {
 // ======================================================================================================
 
 model Player {
-  id                    String                  @id @default(uuid())
-  displayName           String                  @map("display_name")
-  oauthProvider         String                  @map("oauth_provider")
-  oauthId               String                  @map("oauth_id")
-  createdAt             DateTime                @default(now()) @map("created_at")
-  lastActiveAt          DateTime                @updatedAt @map("last_active_at")
+  id            String   @id @default(uuid())
+  displayName   String   @map("display_name")
+  oauthProvider String   @map("oauth_provider")
+  oauthId       String   @map("oauth_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  lastActiveAt  DateTime @updatedAt @map("last_active_at")
 
-  buildings             Building[]
+  buildings Building[]
 
   @@unique([oauthProvider, oauthId])
   @@map("players")
@@ -36,15 +36,15 @@ model Player {
 // ======================================================================================================
 
 model GameWorld {
-  id                    String                  @id @default(uuid())
-  name                  String
-  status                String                  @default("active")
-  createdAt             DateTime                @default(now()) @map("created_at")
-  completedAt           DateTime?               @map("completed_at")
-  config                Json
+  id          String    @id @default(uuid())
+  name        String
+  status      String    @default("active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  completedAt DateTime? @map("completed_at")
+  config      Json
 
-  fortresses            Fortress[]
-  buildingTypes         BuildingType[]
+  fortresses    Fortress[]
+  buildingTypes BuildingType[]
 
   @@map("game_worlds")
 }
@@ -54,22 +54,22 @@ model GameWorld {
 // ======================================================================================================
 
 model Fortress {
-  id                    String              @id @default(uuid())
-  gameWorldId           String              @map("game_world_id")
-  name                  String
-  positionX             Float               @map("position_x")
-  positionY             Float               @map("position_y")
-  owner                 String              @default("enemy")
-  parentId              String?             @map("parent_id")
-  captureThreshold      Int                 @map("capture_threshold")
-  difficultyTier        Int                 @map("difficulty_tier")
-  capturedAt            DateTime            @default(now()) @map("captured_at")
+  id               String   @id @default(uuid())
+  gameWorldId      String   @map("game_world_id")
+  name             String
+  positionX        Float    @map("position_x")
+  positionY        Float    @map("position_y")
+  owner            String   @default("enemy")
+  parentId         String?  @map("parent_id")
+  captureThreshold Int      @map("capture_threshold")
+  difficultyTier   Int      @map("difficulty_tier")
+  capturedAt       DateTime @default(now()) @map("captured_at")
 
-  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
-  parent                Fortress?           @relation("FortressTree", fields: [parentId], references: [id])
-  children              Fortress[]          @relation("FortressTree")
+  gameWorld GameWorld  @relation(fields: [gameWorldId], references: [id])
+  parent    Fortress?  @relation("FortressTree", fields: [parentId], references: [id])
+  children  Fortress[] @relation("FortressTree")
 
-  buildings             Building[]
+  buildings Building[]
 
   @@map("fortresses")
 }
@@ -79,15 +79,15 @@ model Fortress {
 // ======================================================================================================
 
 model BuildingType {
-  id                    String              @id @default(uuid())
-  gameWorldId           String              @map("game_world_id")
-  name                  String
-  productionRate        Float               @map("production_rate")
-  unlockTier            Int                 @map("unlock_tier")
-  description           String
+  id             String @id @default(uuid())
+  gameWorldId    String @map("game_world_id")
+  name           String
+  productionRate Float  @map("production_rate")
+  unlockTier     Int    @map("unlock_tier")
+  description    String
 
-  gameWorld             GameWorld           @relation(fields: [gameWorldId], references: [id])
-  buildings             Building[]
+  gameWorld GameWorld  @relation(fields: [gameWorldId], references: [id])
+  buildings Building[]
 
   @@map("building_types")
 }
@@ -97,16 +97,16 @@ model BuildingType {
 // ======================================================================================================
 
 model Building {
-  id                    String              @id @default(uuid())
-  fortressId            String              @map("fortress_id")
-  buildingTypeId        String              @map("building_type_id")
-  builtBy               String              @map("built_by")
-  builtAt               DateTime            @default(now()) @map("built_at")
-  unitCount             Int                 @default(0) @map("unit_count")
+  id             String   @id @default(uuid())
+  fortressId     String   @map("fortress_id")
+  buildingTypeId String   @map("building_type_id")
+  builtBy        String   @map("built_by")
+  builtAt        DateTime @default(now()) @map("built_at")
+  unitCount      Int      @default(0) @map("unit_count")
 
-  fortress              Fortress            @relation(fields: [fortressId], references: [id])
-  buildingType          BuildingType        @relation(fields: [buildingTypeId], references: [id])
-  player                Player              @relation(fields: [builtBy], references: [id])
+  fortress     Fortress     @relation(fields: [fortressId], references: [id])
+  buildingType BuildingType @relation(fields: [buildingTypeId], references: [id])
+  player       Player       @relation(fields: [builtBy], references: [id])
 
   @@map("buildings")
 }

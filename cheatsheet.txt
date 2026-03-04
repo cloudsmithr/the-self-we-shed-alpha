@@ -6,14 +6,16 @@ npm install @prisma/adapter-pg
 npm install --save-dev @types/pg
 npm install -D tsx
 
+RUN FROM PRISMA FOLDER:
+
 npx prisma generate
 
 migrations:
 - reset DB and apply all migrations:
-npx prisma migrate reset
+ npx prisma migrate reset --config ../prisma.config.ts
 
 - apply all existing migrations:
-npx prisma migrate deploy
+npx prisma migrate deploy --config ../prisma.config.ts
 
 - apply new migration:
-npx prisma migrate dev --name <migration_name>
+npx prisma migrate dev --name <migration_name>  --config ../prisma.config.ts
