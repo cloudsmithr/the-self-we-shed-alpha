@@ -15,3 +15,5 @@ npx prisma migrate reset
 - apply all existing migrations:
 npx prisma migrate deploy
 
+- apply new migration:
+npx prisma migrate dev --name <migration_name>
