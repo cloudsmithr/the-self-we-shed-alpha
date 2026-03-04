@@ -1,6 +1,7 @@
 import { PrismaClient } from '../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { SYSTEM_PLAYER_ID } from '@shared/types/constants';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not defined');
@@ -12,7 +13,6 @@ const pool = new Pool({
 
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-const SYSTEM_PLAYER_ID = '00000000-0000-0000-0000-000000000001';
 
 async function main() {
   await prisma.player.upsert({
