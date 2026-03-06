@@ -63,7 +63,6 @@ export class AuthService {
   async findOrCreatePlayer(params: {
     oauthProvider: string;
     oauthId: string;
-    displayName: string;
   }): Promise<PlayerFromJwt> {
     {
       const { oauthProvider, oauthId } = params;
