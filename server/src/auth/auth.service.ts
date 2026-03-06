@@ -16,7 +16,7 @@ export interface PlayerFromJwt {
 
 const WORDS_A = ['Shadow', 'Iron', 'Ghost', 'Storm', 'Ember'];
 const WORDS_B = ['Fox', 'Wolf', 'Hawk', 'Bear', 'Lynx'];
-const SUFFIX_CHARS = 'abcdefghijklmnopqrstuvwxyz123456789';
+const SUFFIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
 
 function randomItem<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)] as T;
