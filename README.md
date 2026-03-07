@@ -18,17 +18,17 @@ Think r/place meets an incremental grand strategy game.
 
 ## Stack
 
-| Layer | Choice |
-|-------|--------|
-| Backend API | Node.js / TypeScript / NestJS |
-| Real-time | Socket.IO (server push only) |
-| Game loop | Standalone Node.js worker process |
-| Database | PostgreSQL + Prisma |
+| Layer | Choice                                       |
+|-------|----------------------------------------------|
+| Backend API | Node.js / TypeScript / NestJS                |
+| Real-time | Socket.IO (server push only)                 |
+| Game loop | Standalone Go worker process                 |
+| Database | PostgreSQL + Prisma                          |
 | Cache / messaging | Redis (hot state + pub/sub + Socket.IO adapter) |
-| Frontend | React + TypeScript |
-| Auth | Passport.js OAuth2 (Google + Discord) + JWT |
-| Hosting (Phase 1) | Hetzner VPS + Docker Compose + Caddy |
-| Hosting (Phase 2) | AWS ECS Fargate + RDS + ElastiCache + CDK |
+| Frontend | React + TypeScript                           |
+| Auth | Passport.js OAuth2 (Google) + JWT     |
+| Hosting (Phase 1) | Hetzner VPS + Docker Compose + Caddy         |
+| Hosting (Phase 2) | AWS ECS Fargate + RDS + ElastiCache + CDK    |
 
 ---
 

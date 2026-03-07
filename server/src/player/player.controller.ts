@@ -1,9 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { Player } from '@prisma/client';
-import { CurrentPlayer } from '@/auth/decorators/current-player.decorator';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { PrismaService } from '../../prisma/prisma.service';
-import type { PlayerFromJwt } from '@/auth/auth.service';
+import { Player } from '../generated/prisma/client.js';
+import { CurrentPlayer } from '../auth/decorators/current-player.decorator.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { PrismaService } from '../../prisma/prisma.service.js';
+import type { PlayerFromJwt } from '@/auth/auth.service.js';
 
 @Controller('player')
 @UseGuards(JwtAuthGuard)

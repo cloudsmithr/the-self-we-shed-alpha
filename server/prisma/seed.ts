@@ -1,17 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import { SYSTEM_PLAYER_ID } from '@shared/types/constants';
+import { SYSTEM_PLAYER_ID } from '@tsws/shared';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not defined');
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg(
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {

@@ -1,10 +1,5 @@
-import { config } from 'dotenv';
-import path from 'path';
-
-config({ path: path.resolve(process.cwd(), '../.env') });
-
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {

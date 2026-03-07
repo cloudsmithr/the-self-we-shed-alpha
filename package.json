@@ -1,5 +1,8 @@
 {
-  "dependencies": {
-    "pg": "^8.19.0"
-  }
+  "name": "the-self-we-shed-alpha",
+  "private": true,
+  "workspaces": [
+    "server2",
+    "shared"
+  ]
 }

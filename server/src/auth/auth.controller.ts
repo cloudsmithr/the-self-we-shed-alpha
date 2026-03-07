@@ -8,8 +8,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { AuthService, PlayerFromJwt } from './auth.service';
-import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { AuthService } from './auth.service.js';
+import { GoogleAuthGuard } from './guards/google-auth.guard.js';
 
 const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -31,7 +31,7 @@ export class AuthController {
     }
 
     const isProduction = process.env['NODE_ENV'] === 'production';
-    const player = req.user as PlayerFromJwt;
+    const player = req.user;
     const token = this.authService.signJwt(player);
 
     res.cookie('access_token', token, {
@@ -47,7 +47,7 @@ export class AuthController {
     res.redirect(redirectionUrl);
   }
 
-  @Post('logout')
+  @Get('logout')
   logout(@Res() res: Response): void {
     res.clearCookie('access_token', {
       httpOnly: true,

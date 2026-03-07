@@ -1,19 +1,31 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { GoogleStrategy } from '@/auth/strategies/google.strategy';
-import { JwtStrategy } from '@/auth/strategies/jwt.strategy';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+import { GoogleStrategy } from './strategies/google.strategy.js';
+import { JwtStrategy } from './strategies/jwt.strategy.js';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 
 @Module({
   imports: [
     PassportModule,
-    JwtModule.register({
-      secret: process.env['JWT_SECRET']!,
-      signOptions: {
-        expiresIn: (process.env['JWT_EXPIRES_IN'] ??
-          '7d') as import('ms').StringValue,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const secret = config.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('Missing JWT_SECRET');
+        }
+        const expiresIn = (config.get<string>('JWT_EXPIRES_IN') ?? '7d') as StringValue;
+        return {
+          secret,
+          signOptions: {
+            expiresIn: expiresIn,
+          },
+        };
       },
     }),
   ],

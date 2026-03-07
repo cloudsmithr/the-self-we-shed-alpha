@@ -1,13 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CommonModule } from '@/common/common.module';
-import { AuthModule } from '@/auth/auth.module';
-import { PrismaModule } from '../prisma/prisma.module';
-import { PlayerModule } from '@/player/player.module';
+import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { CommonModule } from './common/common.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
+import { PlayerModule } from './player/player.module.js';
 
 @Module({
-  imports: [PrismaModule, CommonModule, AuthModule, PlayerModule],
+  imports: [
+    PrismaModule,
+    CommonModule,
+    AuthModule,
+    PlayerModule,
+    ConfigModule.forRoot({
+      envFilePath: '../.env',
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

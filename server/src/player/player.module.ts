@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PlayerController } from './player.controller';
+import { PlayerController } from './player.controller.js';
 
 @Module({
   controllers: [PlayerController],

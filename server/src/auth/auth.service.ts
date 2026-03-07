@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service.js';
 
 export interface JwtPayload {
   sub: string; // player's GUID
@@ -19,7 +19,7 @@ const WORDS_B = ['Fox', 'Wolf', 'Hawk', 'Bear', 'Lynx'];
 const SUFFIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
 
 function randomItem<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)] as T;
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function generateCallsign(): string {

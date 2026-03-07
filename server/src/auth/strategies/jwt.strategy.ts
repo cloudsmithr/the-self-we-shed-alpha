@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { JwtPayload, PlayerFromJwt } from '@/auth/auth.service';
+import { JwtPayload, PlayerFromJwt } from '@/auth/auth.service.js';
 
 function extractJwtFromCookie(req: Request): string | null {
   const cookies = req.cookies as Record<string, string | undefined>;
