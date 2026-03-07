@@ -41,19 +41,18 @@ import { SYSTEM_PLAYER_ID } from '@tsws/shared';
 ## Prisma stuff
 
 ### seed:
+```
 npx prisma db seed
+```
 
 ### prereq for seeding:
+```
 npm install @prisma/adapter-pg
-
 npm install --save-dev @types/pg
-
 npm install -D tsx
-
 npx prisma init
-
 npx prisma generate
-
+```
 ---
 
 ## migrations:
