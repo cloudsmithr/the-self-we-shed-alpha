@@ -38,9 +38,9 @@ The system runs as two separate processes:
 
 **API server** — handles auth, REST endpoints, and Socket.IO connections. All player commands go through REST. Socket.IO is push-only: the server broadcasts state, clients never send game commands over the socket.
 
-**Worker** — runs the tick loop on a configurable interval. Handles army movement, combat resolution, enemy AI, and periodic persistence from Redis to PostgreSQL. Communicates results to the API server via Redis pub/sub.
+**Worker** — runs the tick loop on a configurable interval. Handles unit production, applying user actions, and periodic persistence from Redis to PostgreSQL. Communicates results to the API server via Redis pub/sub.
 
-**Redis** sits between them as the authoritative runtime game state store and message bus. PostgreSQL holds persistent state: accounts, world definition, action history, battle log.
+**Redis** sits between them as the authoritative runtime game state store and message bus. PostgreSQL holds persistent state: accounts, world definition, action history, game log.
 
 ---
 

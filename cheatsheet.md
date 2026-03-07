@@ -1,10 +1,11 @@
 # The Self We Shed Dev Cheatsheet
-
 ## Repo structure
 
-- `server/` — NestJS backend
-- `shared/` — shared TypeScript package used by backend/frontend
-- `.env` — currently lives one directory above `server`
+- `client/` -- React frontend 
+- `server/` -- NestJS backend
+- `worker/` -- Go standalone worker
+- `shared/` -- shared TypeScript package used by backend/frontend
+- `.env` -- currently lives one directory above `server`
 
 ---
 
@@ -37,15 +38,10 @@ import { SYSTEM_PLAYER_ID } from '@tsws/shared';
 ```
 
 ---
+## Prisma commands
 
-## Prisma stuff
-
-### seed:
-```
-npx prisma db seed
-```
-
-### prereq for seeding:
+### Setup:
+prereqs:
 ```
 npm install @prisma/adapter-pg
 npm install --save-dev @types/pg
@@ -53,14 +49,26 @@ npm install -D tsx
 npx prisma init
 npx prisma generate
 ```
----
 
-## migrations:
-### reset DB and apply all migrations:
- npx prisma migrate reset
+run data seeding:
+```
+npx prisma db seed
+```
 
-### apply all existing migrations:
+
+### Migrations:
+reset DB and apply all migrations:
+
+```
+npx prisma migrate reset
+```
+
+apply all existing migrations:
+```
 npx prisma migrate deploy
+```
 
-### apply new migration:
+apply new migration:
+```
 npx prisma migrate dev --name <migration_name>
+```
