@@ -2,7 +2,7 @@
   "name": "the-self-we-shed-alpha",
   "private": true,
   "workspaces": [
-    "server2",
+    "server",
     "shared"
   ]
 }

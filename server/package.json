@@ -29,7 +29,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
-    "@tsws/shared": "0.0.1",
+    "@tsws/shared": "*",
     "cookie-parser": "^1.4.7",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
