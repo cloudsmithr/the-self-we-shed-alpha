@@ -1,4 +1,4 @@
-module github.com/cloudsmithr/the-self-we-shed-alpha
+module github.com/cloudsmithr/the-self-we-shed-alpha/worker
 
 go 1.25.4
 

@@ -24,3 +24,7 @@ func (r *RedisClient) Ping(ctx context.Context) error {
 func (r *RedisClient) Client() *redis.Client {
 	return r.client
 }
+
+func (r *RedisClient) Close() error {
+	return r.client.Close()
+}
