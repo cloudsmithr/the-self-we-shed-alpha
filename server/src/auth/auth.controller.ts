@@ -25,7 +25,10 @@ export class AuthController {
 
   @Get('callback/google')
   @UseGuards(GoogleAuthGuard)
-  googleCallback(@Req() req: Request, @Res() res: Response): void {
+  googleCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): void {
     if (!req.user) {
       throw new UnauthorizedException();
     }

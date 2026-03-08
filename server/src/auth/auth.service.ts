@@ -4,12 +4,10 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 
 export interface JwtPayload {
   sub: string; // player's GUID
-  displayName: string;
 }
 
 export interface PlayerFromJwt {
   id: string;
-  displayName: string;
 }
 
 // --- Callsign generator ---
@@ -86,7 +84,6 @@ export class AuthService {
   signJwt(player: PlayerFromJwt): string {
     const payload: JwtPayload = {
       sub: player.id,
-      displayName: player.displayName,
     };
     return this.jwtService.sign(payload);
   }
