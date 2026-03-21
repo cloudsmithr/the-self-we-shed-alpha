@@ -11,4 +11,9 @@ public class Player
     public required string OAuthId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime LastActiveAt { get; set; }
+
+#pragma warning disable CS8618
+    [Timestamp]
+    public byte[] Version { get; set; }
+#pragma warning restore CS8618
 }

@@ -15,4 +15,9 @@ public class GameWorld
 
     public ICollection<Fortress> Fortresses { get; set; } = new List<Fortress>();
     public ICollection<BuildingType> BuildingTypes { get; set; } = new List<BuildingType>();
+
+#pragma warning disable CS8618
+    [Timestamp]
+    public byte[] Version { get; set; }
+#pragma warning restore CS8618
 }

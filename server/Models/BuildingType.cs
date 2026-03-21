@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ApiServer.Models;
 
 public class BuildingType
@@ -16,4 +18,9 @@ public class BuildingType
     public string Description { get; set; } = null!;
 
     public ICollection<Building> Buildings { get; set; } = new List<Building>();
+
+#pragma warning disable CS8618
+    [Timestamp]
+    public byte[] Version { get; set; }
+#pragma warning restore CS8618
 }
