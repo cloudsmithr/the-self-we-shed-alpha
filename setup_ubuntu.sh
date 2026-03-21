@@ -85,8 +85,10 @@ if nvm ls --no-colors 2>/dev/null | grep -q "24/\*\|$(nvm alias 24 2>/dev/null)"
   success "Node 24 already installed ($(node --version))"
 else
   nvm install 24
+  nvm alias default 24
+  nvm use 24
 
-  success "Node $(node --version) installed"
+  success "Node $(node --version) installed and set as default"
 fi
 
 # -----------------------------------------------------------------------------
