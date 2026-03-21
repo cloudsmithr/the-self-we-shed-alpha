@@ -41,7 +41,7 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-# 2. Go 1.26
+# 2. Go 1.26.1
 # -----------------------------------------------------------------------------
 info "Go 1.26.1"
 
@@ -49,8 +49,16 @@ GO_VERSION="1.26.1"
 GO_TARBALL="go${GO_VERSION}.linux-amd64.tar.gz"
 GO_URL="https://go.dev/dl/${GO_TARBALL}"
 GO_INSTALL_DIR="/usr/local"
+GO_BIN="${GO_INSTALL_DIR}/go/bin/go"
+PROFILE_LINE='export PATH="$PATH:/usr/local/go/bin"'
 
-if go version 2>/dev/null | grep -q "go${GO_VERSION}"; then
+for rc in "$HOME/.bashrc" "$HOME/.profile"; do
+  grep -qxF "${PROFILE_LINE}" "${rc}" 2>/dev/null || echo "${PROFILE_LINE}" >> "${rc}"
+done
+
+export PATH="$PATH:/usr/local/go/bin"
+
+if [ -x "${GO_BIN}" ] && "${GO_BIN}" version | grep -q "go${GO_VERSION}"; then
   success "Go ${GO_VERSION} already installed"
 else
   wget -q --show-progress "${GO_URL}" -O "/tmp/${GO_TARBALL}"
@@ -58,13 +66,6 @@ else
   sudo tar -C "${GO_INSTALL_DIR}" -xzf "/tmp/${GO_TARBALL}"
   rm "/tmp/${GO_TARBALL}"
 
-  # Add to PATH if not already there
-  PROFILE_LINE='export PATH="$PATH:/usr/local/go/bin"'
-  for rc in "$HOME/.bashrc" "$HOME/.profile"; do
-    grep -qxF "${PROFILE_LINE}" "${rc}" 2>/dev/null || echo "${PROFILE_LINE}" >> "${rc}"
-  done
-
-  export PATH="$PATH:/usr/local/go/bin"
   success "Go $(go version) installed"
 fi
 
@@ -85,13 +86,14 @@ fi
 # Load nvm in current shell
 \. "$HOME/.nvm/nvm.sh"
 
-if nvm ls --no-colors 2>/dev/null | grep -q "24/\*\|$(nvm alias 24 2>/dev/null)"; then
-  success "Node 24 already installed ($(node --version))"
+if nvm version 24 >/dev/null 2>&1; then
+  nvm alias default 24 >/dev/null
+  nvm use 24 >/dev/null
+  success "Node $(node --version) already installed and set as default"
 else
   nvm install 24
-  nvm alias default 24
-  nvm use 24
-
+  nvm alias default 24 >/dev/null
+  nvm use 24 >/dev/null
   success "Node $(node --version) installed and set as default"
 fi
 
