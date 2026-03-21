@@ -768,7 +768,7 @@ Separate workflows for backend and frontend. Both triggered on push to `main`.
 ├── docker-compose.yml                      — Local dev: API server + worker + PostgreSQL + Redis
 ├── Dockerfile.server                       — API server image
 ├── Dockerfile.worker                       — Worker image
-├── src/server/Privarta.Game.Api.csproj
+├── src/server/ApiServer.csproj
 ├── README.md
 └── .gitignore
 ```
