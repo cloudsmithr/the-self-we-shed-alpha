@@ -36,6 +36,14 @@ else
   success ".NET $(dotnet --version) installed"
 fi
 
+if dotnet tool list --global | awk '{print $1}' | grep -qx 'dotnet-ef'; then
+  dotnet tool update --global dotnet-ef
+else
+  dotnet tool install --global dotnet-ef
+fi
+
+success ".NET EF installed: $(dotnet ef --version)"
+
 # -----------------------------------------------------------------------------
 # 2. Go 1.26.1
 # -----------------------------------------------------------------------------
