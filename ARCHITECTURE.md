@@ -293,8 +293,8 @@ fortresses
 ├── id (UUID, PK)
 ├── game_world_id (FK → game_worlds)
 ├── name (VARCHAR)
-├── position_x (FLOAT) — map coordinates
-├── position_y (FLOAT)
+├── position_x (INT) — map coordinates
+├── position_y (INT)
 ├── owner (VARCHAR) — "human" | "enemy"
 ├── parent_id (FK → fortresses, nullable) — null for the final center fortress
 ├── capture_threshold (INT) — units required to trigger capture of this fortress
@@ -780,10 +780,10 @@ Separate workflows for backend and frontend. Both triggered on push to `main`.
 ## 13. Milestone Plan
 
 ### Phase 1A: Foundation (Weeks 1–2)
-- [ ] Initialize repository and baseline project structure
-- [ ] Configure Docker Compose for local development
-- [ ] Scaffold ASP.NET Core API Server
-- [ ] Configure API Server integration with PostgreSQL and Redis
+- [DONE] Initialize repository and baseline project structure
+- [DONE] Configure Docker Compose for local development
+- [DONE] Scaffold ASP.NET Core API Server
+- [DONE] Configure API Server integration with PostgreSQL and Redis
 - [ ] Set up EF Core migrations and establish initial schema
 - [ ] Implement external authentication providers (Google + Discord)
 - [ ] Build initial REST endpoints for player profile and game state reads
