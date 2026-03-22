@@ -3,7 +3,7 @@ using ApiServer.Enums;
 
 namespace ApiServer.Models;
 
-public class PlayerContribution
+public class PlayerContribution : BaseEntity
 {
     public Guid Id { get; set; }
 
@@ -20,11 +20,4 @@ public class PlayerContribution
 
     public Guid BuildingTypeId { get; set; }
     public BuildingType BuildingType { get; set; } = null!;
-
-    public DateTime CreatedAt { get; set; }
-
-#pragma warning disable CS8618
-    [Timestamp]
-    public byte[] Version { get; set; }
-#pragma warning restore CS8618
 }

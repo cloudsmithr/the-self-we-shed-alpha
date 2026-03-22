@@ -3,7 +3,7 @@ using ApiServer.Enums;
 
 namespace ApiServer.Models;
 
-public class Fortress
+public class Fortress : BaseEntity
 {
     public Guid Id { get; set; }
 
@@ -27,9 +27,4 @@ public class Fortress
     public int DifficultyTier { get; set; }
 
     public bool IsFinalObjective { get; set; }
-
-#pragma warning disable CS8618
-    [Timestamp]
-    public byte[] Version { get; set; }
-#pragma warning restore CS8618
 }

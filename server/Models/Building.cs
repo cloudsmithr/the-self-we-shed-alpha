@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApiServer.Models;
 
-public class Building
+public class Building : BaseEntity
 {
     public Guid Id { get; set; }
 
@@ -18,9 +18,4 @@ public class Building
     public Player BuiltBy { get; set; } = null!;
 
     public DateTime BuiltAt { get; set; }
-
-#pragma warning disable CS8618
-    [Timestamp]
-    public byte[] Version { get; set; }
-#pragma warning restore CS8618
 }

@@ -21,6 +21,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Player>(e =>
         {
             e.HasIndex(p => new { p.OAuthProvider, p.OAuthId }).IsUnique();
+            
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
 
         modelBuilder.Entity<GameWorld>(e =>
@@ -30,6 +33,9 @@ public class AppDbContext : DbContext
 
             e.Property(x => x.Config)
                 .HasColumnType("jsonb");
+
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
 
         modelBuilder.Entity<Fortress>(e =>
@@ -50,6 +56,9 @@ public class AppDbContext : DbContext
                 .WithMany(x => x.Children)
                 .HasForeignKey(x => x.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
 
         modelBuilder.Entity<BuildingType>(e =>
@@ -58,6 +67,9 @@ public class AppDbContext : DbContext
                 .WithMany(g => g.BuildingTypes)
                 .HasForeignKey(x => x.GameWorldId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
 
         modelBuilder.Entity<Building>(e =>
@@ -76,6 +88,9 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.BuiltById)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
 
         modelBuilder.Entity<PlayerContribution>(e =>
@@ -102,6 +117,9 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.BuildingTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            e.Property(x => x.Version)
+                .IsRowVersion();
         });
     }
 }
