@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ApiServer.Models;
 
-public class Building
+public class Building : BaseEntity
 {
     public Guid Id { get; set; }
 

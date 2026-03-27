@@ -13,14 +13,24 @@ public class AppDbContext : DbContext
     public DbSet<BuildingType> BuildingTypes => Set<BuildingType>();
     public DbSet<Building> Buildings => Set<Building>();
     public DbSet<PlayerContribution> PlayerContributions => Set<PlayerContribution>();
-
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Player>(e =>
         {
-            e.HasIndex(p => new { p.OAuthProvider, p.OAuthId }).IsUnique();
+            e.HasIndex(p => new { p.OAuthProvider, p.OAuthId })
+                .IsUnique();
+            e.HasIndex(p => p.DisplayName)
+                .IsUnique();
+            e.Property(p => p.DisplayName)
+                .HasMaxLength(64);
+            e.Property(p => p.OAuthProvider)
+                .HasMaxLength(32);
+            e.Property(p => p.OAuthId)
+                .HasMaxLength(256);
         });
 
         modelBuilder.Entity<GameWorld>(e =>
@@ -102,6 +112,20 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.BuildingTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<RefreshToken>(e =>
+        {
+            e.HasKey(rt => rt.Id);
+
+            e.HasIndex(rt => rt.TokenHash).IsUnique();
+            e.HasIndex(rt => rt.PlayerId);
+            e.HasIndex(rt => rt.FamilyId);
+
+            e.HasOne(rt => rt.Player)
+                .WithMany()
+                .HasForeignKey(rt => rt.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

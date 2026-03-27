@@ -1,8 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using ApiServer.Enums;
 
 namespace ApiServer.Models;
 
-public class Fortress
+public class Fortress : BaseEntity
 {
     public Guid Id { get; set; }
 
