@@ -13,17 +13,24 @@ public class AppDbContext : DbContext
     public DbSet<BuildingType> BuildingTypes => Set<BuildingType>();
     public DbSet<Building> Buildings => Set<Building>();
     public DbSet<PlayerContribution> PlayerContributions => Set<PlayerContribution>();
-
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Player>(e =>
         {
-            e.HasIndex(p => new { p.OAuthProvider, p.OAuthId }).IsUnique();
-            
-            e.Property(x => x.Version)
-                .IsRowVersion();
+            e.HasIndex(p => new { p.OAuthProvider, p.OAuthId })
+                .IsUnique();
+            e.HasIndex(p => p.DisplayName)
+                .IsUnique();
+            e.Property(p => p.DisplayName)
+                .HasMaxLength(64);
+            e.Property(p => p.OAuthProvider)
+                .HasMaxLength(32);
+            e.Property(p => p.OAuthId)
+                .HasMaxLength(256);
         });
 
         modelBuilder.Entity<GameWorld>(e =>
@@ -33,9 +40,6 @@ public class AppDbContext : DbContext
 
             e.Property(x => x.Config)
                 .HasColumnType("jsonb");
-
-            e.Property(x => x.Version)
-                .IsRowVersion();
         });
 
         modelBuilder.Entity<Fortress>(e =>
@@ -56,9 +60,6 @@ public class AppDbContext : DbContext
                 .WithMany(x => x.Children)
                 .HasForeignKey(x => x.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            e.Property(x => x.Version)
-                .IsRowVersion();
         });
 
         modelBuilder.Entity<BuildingType>(e =>
@@ -67,9 +68,6 @@ public class AppDbContext : DbContext
                 .WithMany(g => g.BuildingTypes)
                 .HasForeignKey(x => x.GameWorldId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
-            e.Property(x => x.Version)
-                .IsRowVersion();
         });
 
         modelBuilder.Entity<Building>(e =>
@@ -88,9 +86,6 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.BuiltById)
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            e.Property(x => x.Version)
-                .IsRowVersion();
         });
 
         modelBuilder.Entity<PlayerContribution>(e =>
@@ -117,9 +112,20 @@ public class AppDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(x => x.BuildingTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
-            e.Property(x => x.Version)
-                .IsRowVersion();
+        });
+        
+        modelBuilder.Entity<RefreshToken>(e =>
+        {
+            e.HasKey(rt => rt.Id);
+
+            e.HasIndex(rt => rt.TokenHash).IsUnique();
+            e.HasIndex(rt => rt.PlayerId);
+            e.HasIndex(rt => rt.FamilyId);
+
+            e.HasOne(rt => rt.Player)
+                .WithMany()
+                .HasForeignKey(rt => rt.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

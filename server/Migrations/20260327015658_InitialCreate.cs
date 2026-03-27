@@ -19,8 +19,10 @@ namespace ApiServer.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     Config = table.Column<string>(type: "jsonb", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,8 +37,10 @@ namespace ApiServer.Migrations
                     DisplayName = table.Column<string>(type: "text", nullable: false),
                     OAuthProvider = table.Column<string>(type: "text", nullable: false),
                     OAuthId = table.Column<string>(type: "text", nullable: false),
+                    LastActiveAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    LastActiveAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,7 +56,10 @@ namespace ApiServer.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     ProductionRate = table.Column<float>(type: "real", nullable: false),
                     UnlockTier = table.Column<int>(type: "integer", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false)
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +85,10 @@ namespace ApiServer.Migrations
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     CaptureThreshold = table.Column<int>(type: "integer", nullable: false),
                     DifficultyTier = table.Column<int>(type: "integer", nullable: false),
-                    IsFinalObjective = table.Column<bool>(type: "boolean", nullable: false)
+                    IsFinalObjective = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,6 +108,32 @@ namespace ApiServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TokenHash = table.Column<string>(type: "text", nullable: false),
+                    PlayerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FamilyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ConsumedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Players_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "Players",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Buildings",
                 columns: table => new
                 {
@@ -106,7 +142,10 @@ namespace ApiServer.Migrations
                     BuildingTypeId = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalUnits = table.Column<int>(type: "integer", nullable: false),
                     BuiltById = table.Column<Guid>(type: "uuid", nullable: false),
-                    BuiltAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    BuiltAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,7 +180,9 @@ namespace ApiServer.Migrations
                     ActionType = table.Column<string>(type: "text", nullable: false),
                     TargetFortressId = table.Column<Guid>(type: "uuid", nullable: false),
                     BuildingTypeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -227,6 +268,22 @@ namespace ApiServer.Migrations
                 table: "Players",
                 columns: new[] { "OAuthProvider", "OAuthId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_FamilyId",
+                table: "RefreshTokens",
+                column: "FamilyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_PlayerId",
+                table: "RefreshTokens",
+                column: "PlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_TokenHash",
+                table: "RefreshTokens",
+                column: "TokenHash",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -237,6 +294,9 @@ namespace ApiServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "PlayerContributions");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "BuildingTypes");
