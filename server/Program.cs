@@ -106,50 +106,49 @@ var builder = WebApplication.CreateBuilder(args);
         });
 
 // --- SERVICES ----------------------------------------------------------------------------------------------------
-builder.Services.AddScoped<IOAuthClaimsExtractor, OAuthClaimsExtractor>();
-builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddOpenApi();
+    builder.Services.AddScoped<IJwtService, JwtService>();
+    builder.Services.AddOpenApi();
 
 // --- FILTERS -----------------------------------------------------------------------------------------------------
 
-builder.Services.AddScoped<RequireCustomHeaderFilter>();
+    builder.Services.AddScoped<RequireCustomHeaderFilter>();
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.AddService<RequireCustomHeaderFilter>();
-});
+    builder.Services.AddControllers(options =>
+    {
+        options.Filters.AddService<RequireCustomHeaderFilter>();
+    });
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
-    // Trust only local reverse proxy (Caddy/nginx on same host)
-    options.KnownProxies.Add(System.Net.IPAddress.Loopback);
-    options.KnownProxies.Add(System.Net.IPAddress.IPv6Loopback);
-    options.ForwardLimit = 1;
-});
+        // Trust only local reverse proxy (Caddy/nginx on same host)
+        options.KnownProxies.Add(System.Net.IPAddress.Loopback);
+        options.KnownProxies.Add(System.Net.IPAddress.IPv6Loopback);
+        options.ForwardLimit = 1;
+    });
 
 
 // --- APP ----------------------------------------------------------------------------------------------------
-var app = builder.Build();
-app.UseForwardedHeaders(); 
+    var app = builder.Build();
+    app.UseForwardedHeaders(); 
 
 // Dev-only migrations before serving traffic
-if (app.Environment.IsDevelopment())
-{
-//    using var scope = app.Services.CreateScope();
- //   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-  //  db.Database.Migrate();
-    app.MapOpenApi();
+    if (app.Environment.IsDevelopment())
+    {
+    //    using var scope = app.Services.CreateScope();
+     //   var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+      //  db.Database.Migrate();
+        app.MapOpenApi();
 
-}
+    }
 
-app.UseRouting();
-app.UseCors("spa");
+    app.UseRouting();
+    app.UseCors("spa");
 
-app.UseAuthentication();
-app.UseAuthorization();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
-app.MapControllers();
+    app.MapControllers();
 
-app.Run();
+    app.Run();

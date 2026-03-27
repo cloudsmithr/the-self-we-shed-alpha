@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 namespace ApiServer.Controllers;
@@ -28,12 +27,14 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _db;
     private readonly IConfiguration _config;
     private readonly ILogger<AuthController> _logger;
-
-    public AuthController(AppDbContext db, IConfiguration config, ILogger<AuthController> logger)
+    private readonly IJwtService _jwtService;
+    
+    public AuthController(AppDbContext db, IConfiguration config, ILogger<AuthController> logger, IJwtService jwtService)
     {
         _db = db;
         _config = config;
         _logger = logger;
+        _jwtService = jwtService;
     }
 
     // ───────────────────────────── OAuth ─────────────────────────────
@@ -59,12 +60,9 @@ public class AuthController : ControllerBase
         try
         {
             var googleId = result.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-            //var displayName = result.Principal?.FindFirstValue(ClaimTypes.Name);
 
             if (string.IsNullOrWhiteSpace(googleId))
                 return Unauthorized();
-
-            //displayName = SanitizeDisplayName(displayName);
             
             // 1) Ensure player exists (and get the canonical row) with a tight race handler.
             var player = await GetOrCreatePlayerCanonicalAsync(OAuthProviderGoogle, googleId);
@@ -80,7 +78,7 @@ public class AuthController : ControllerBase
             var (rawRefresh, refreshEntity) = PrepareRefreshToken(player.Id);
             SetRefreshCookie(rawRefresh, refreshEntity.ExpiresAt);
 
-            var (jwt, jwtExpires) = GenerateJwt(player);
+            var (jwt, jwtExpires) =  _jwtService.GenerateAccessToken(player);
             SetJwtCookie(jwt, jwtExpires);
 
             await _db.SaveChangesAsync();
@@ -232,7 +230,7 @@ public class AuthController : ControllerBase
         var player = storedToken.Player;
         player.LastActiveAt = now;
 
-        var (jwt, jwtExpires) = GenerateJwt(player);
+        var (jwt, jwtExpires) = _jwtService.GenerateAccessToken(player);
         SetJwtCookie(jwt, jwtExpires);
 
         var (rawRefresh, refreshEntity) = PrepareRefreshToken(player.Id, storedToken.FamilyId);
@@ -291,51 +289,7 @@ public class AuthController : ControllerBase
         return Ok(new { player = new { player.Id, player.DisplayName } });
     }
 
-    // ───────────────────────────── JWT ─────────────────────────────
-
-    private (string Token, DateTime Expires) GenerateJwt(Player player)
-    {
-        var issuer = _config["Authentication:Jwt:Issuer"]
-                     ?? throw new InvalidOperationException("Missing Jwt:Issuer");
-        var audience = _config["Authentication:Jwt:Audience"]
-                       ?? throw new InvalidOperationException("Missing Jwt:Audience");
-        var secret = _config["Authentication:Jwt:Secret"]
-                     ?? throw new InvalidOperationException("Missing Jwt:Secret");
-
-        var keyBytes = Encoding.UTF8.GetBytes(secret);
-        if (keyBytes.Length < 32)
-            throw new InvalidOperationException("Authentication:Jwt:Secret must be at least 32 bytes.");
-
-        var key = new SymmetricSecurityKey(keyBytes);
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var now = DateTime.UtcNow;
-
-        var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, player.Id.ToString()),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-            new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(now).ToUnixTimeSeconds().ToString(),
-                ClaimValueTypes.Integer64),
-        };
-
-        var expiryStr = _config["Authentication:Jwt:ExpiryInMinutes"];
-        var expiryInMinutes = int.TryParse(expiryStr, out var m) ? m : 15;
-
-        var expires = now.AddMinutes(expiryInMinutes);
-
-        var token = new JwtSecurityToken(
-            issuer: issuer,
-            audience: audience,
-            claims: claims,
-            notBefore: now,
-            expires: expires,
-            signingCredentials: credentials
-        );
-
-        return (new JwtSecurityTokenHandler().WriteToken(token), expires);
-    }
-
+    
     // ───────────────────────────── Refresh Tokens ─────────────────────────────
 
     /// <summary>
@@ -450,14 +404,5 @@ public class AuthController : ControllerBase
     {
         Response.Headers.CacheControl = "no-store";
         Response.Headers.Pragma = "no-cache";
-    }
-
-    private static string SanitizeDisplayName(string? name)
-    {
-        name = (name ?? "Unknown").Trim();
-        if (name.Length == 0) name = "Unknown";
-        name = new string(name.Where(c => !char.IsControl(c)).ToArray());
-        if (name.Length > 40) name = name[..40];
-        return name.Length == 0 ? "Unknown" : name;
     }
 }
